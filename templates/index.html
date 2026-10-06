@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stack Visualizer</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f5ff;
+            color: #222;
+        }
+
+        /* HEADER */
+
+        .header {
+            text-align: center;
+            padding: 25px 20px 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 42px;
+            color: #4b3f72;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        /* MAIN CARD */
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-top: 20px;
+        }
+
+        /* INPUT */
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 220px;
+            padding: 14px;
+            font-size: 17px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #6c5ce7;
+        }
+
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .push {
+            background: #16a34a;
+        }
+
+        .pop {
+            background: #dc2626;
+        }
+
+        .peek {
+            background: #4f46e5;
+        }
+
+        /* MESSAGE */
+
+        .message {
+            text-align: center;
+            min-height: 30px;
+            font-weight: bold;
+            font-size: 17px;
+            margin: 15px;
+        }
+
+        /* STACK AREA */
+
+        .stack-area {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-top: 25px;
+            min-height: 450px;
+        }
+
+        .stack-container {
+            width: 260px;
+            height: 400px;
+
+            border-left: 8px solid #333;
+            border-right: 8px solid #333;
+            border-bottom: 8px solid #333;
+
+            border-radius: 0 0 8px 8px;
+
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: flex-start;
+            align-items: center;
+
+            padding: 10px;
+        }
+
+        /* STACK ELEMENT */
+
+        .stack-item {
+            width: 210px;
+            height: 55px;
+
+            background: linear-gradient(
+                135deg,
+                #6c5ce7,
+                #8e7dff
+            );
+
+            color: white;
+
+            margin: 4px;
+
+            border-radius: 8px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 20px;
+            font-weight: bold;
+
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+
+            animation: pushAnimation 0.3s ease;
+        }
+
+        @keyframes pushAnimation {
+
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+        }
+
+        /* TOP */
+
+        .top-label {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4b3f72;
+        }
+
+        .arrow {
+            font-size: 30px;
+        }
+
+        /* INFORMATION */
+
+        .info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .info-box {
+            background: #f1f0ff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .info-box strong {
+            display: block;
+            font-size: 22px;
+            color: #4b3f72;
+            margin-top: 5px;
+        }
+
+        /* STACK ARRAY */
+
+        .array-view {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 18px;
+        }
+
+        .array-view code {
+            background: #222;
+            color: #00ff88;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        /* LIFO */
+
+        .lifo {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+        }
+
+        .lifo strong {
+            color: #4b3f72;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:600px) {
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .stack-container {
+                width: 220px;
+            }
+
+            .stack-item {
+                width: 170px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="header">
+
+        <h1>STACK</h1>
+
+        <p>
+            Last In, First Out — <strong>LIFO</strong>
+        </p>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="card">
+
+            <!-- INPUT + BUTTONS -->
+
+            <div class="controls">
+
+                <input
+                    type="text"
+                    id="valueInput"
+                    placeholder="Enter value"
+                >
+
+                <button
+                    class="push"
+                    onclick="pushValue()"
+                >
+                    PUSH
+                </button>
+
+                <button
+                    class="pop"
+                    onclick="popValue()"
+                >
+                    POP
+                </button>
+
+                <button
+                    class="peek"
+                    onclick="peekValue()"
+                >
+                    PEEK
+                </button>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <div
+                class="message"
+                id="message"
+            >
+                Stack is ready 🚀
+            </div>
+
+
+            <!-- TOP -->
+
+            <div class="top-label">
+
+                TOP
+
+                <div class="arrow">
+                    ↓
+                </div>
+
+            </div>
+
+
+            <!-- STACK -->
+
+            <div class="stack-area">
+
+                <div
+                    class="stack-container"
+                    id="stack"
+                >
+
+                </div>
+
+            </div>
+
+
+            <!-- INFORMATION -->
+
+            <div class="info">
+
+                <div class="info-box">
+
+                    Top Index
+
+                    <strong id="topIndex">
+                        -1
+                    </strong>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    Size
+
+                    <strong id="size">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ARRAY REPRESENTATION -->
+
+            <div class="array-view">
+
+                <div>
+                    Internal Stack Representation
+                </div>
+
+                <code id="arrayView">
+                    []
+                </code>
+
+            </div>
+
+
+            <!-- LIFO EXPLANATION -->
+
+            <div class="lifo">
+
+                <strong>LIFO:</strong>
+
+                The last element pushed into the stack
+                is the first element removed.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<script>
+
+    // Our stack
+    let stack = [];
+
+
+    // PUSH
+    function pushValue() {
+
+        let input =
+            document.getElementById("valueInput");
+
+        let value = input.value.trim();
+
+
+        // Don't allow empty input
+        if (value === "") {
+
+            showMessage(
+                "⚠️ Enter a value first!",
+                "orange"
+            );
+
+            return;
+        }
+
+
+        // Add to stack
+        stack.push(value);
+
+
+        // Clear input
+        input.value = "";
+
+
+        // Update UI
+        updateStack();
+
+
+        showMessage(
+            "🟢 " + value + " was pushed!",
+            "green"
+        );
+    }
+
+
+
+    // POP
+    function popValue() {
+
+        // Check empty stack
+        if (stack.length === 0) {
+
+            showMessage(
+                "😭 STOP! The stack is EMPTY. There is literally nothing to pop!",
+                "red"
+            );
+
+            return;
+        }
+
+
+        // Remove top element
+        let removed = stack.pop();
+
+
+        // Update UI
+        updateStack();
+
+
+        showMessage(
+            "🔴 Popped: " + removed,
+            "red"
+        );
+    }
+
+
+
+    // PEEK
+    function peekValue() {
+
+        // Check empty
+        if (stack.length === 0) {
+
+            showMessage(
+                "👀 I tried to peek... but the stack is EMPTY!",
+                "red"
+            );
+
+            return;
+        }
+
+
+        // Get top without removing
+        let top =
+            stack[stack.length - 1];
+
+
+        showMessage(
+            "👀 Top element is: " + top,
+            "blue"
+        );
+    }
+
+
+
+    // UPDATE VISUAL STACK
+    function updateStack() {
+
+        let stackElement =
+            document.getElementById("stack");
+
+
+        // Clear previous display
+        stackElement.innerHTML = "";
+
+
+        // Display elements
+        for (
+            let i = 0;
+            i < stack.length;
+            i++
+        ) {
+
+            let item =
+                document.createElement("div");
+
+            item.className = "stack-item";
+
+            item.innerText =
+                stack[i];
+
+            stackElement.appendChild(item);
+        }
+
+
+        // Update index
+        document.getElementById("topIndex")
+            .innerText =
+            stack.length - 1;
+
+
+        // Update size
+        document.getElementById("size")
+            .innerText =
+            stack.length;
+
+
+        // Update array
+        document.getElementById("arrayView")
+            .innerText =
+            "[" + stack.join(", ") + "]";
+    }
+
+
+
+    // MESSAGE
+    function showMessage(
+        text,
+        color
+    ) {
+
+        let message =
+            document.getElementById("message");
+
+        message.innerText = text;
+
+        message.style.color = color;
+    }
+
+</script>
+
+</body>
+
+</html>
